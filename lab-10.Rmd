@@ -84,35 +84,65 @@ A. Yes, the addition of gender to the bty_gen model increased the slope of bty_a
 2) m_bty_gen. Slope of bty_avg (0.074). 
 
 Q10. Create a new model called m_bty_rank with gender removed and rank added in. Write the equation of the linear model and interpret the slopes and intercept in context of the data.
-A. 
+A. Our linear model will be y(score) = 3.98 + 0.07 x bty_avg  - 0.16 x ranktenure track - 0.13 x ranktenured. 
+
+Slope bty_avg 0.07. All else held constant, for each unit increase in bty_ave, we would expect the eval score to be higher, on average, by 0.07 points.
+Slope ranktenure track (-0.16). All else held constant, those on tenure track  receive lower eval scores, on average, by 0.16 points.
+Slope ranktenured (-0.13). All else held constant, those tenured  receive lower eval scores, on average, by 0.13 points.
+Intercept 3.98. Those in the rank of "teaching", with a 0 bty-ave, are expected to have an eval score of 3.98, on average. (A zero bty-ave doesn't make sense in this context.)
+
+
+```{r Part2.10}
+m_bty_rank.lm <- lm(score ~ bty_avg + rank, data = evals)
+summary(m_bty_rank.lm)
+```
 
 ### Part 3: The search for the best model
 Going forward, only consider the following variables as potential predictors: rank, ethnicity, gender, language, age, cls_perc_eval, cls_did_eval, cls_students, cls_level, cls_profs, cls_credits, bty_avg.
 
 Q11. Which variable, on its own, would you expect to be the worst predictor of evaluation scores? Why? Hint: Think about which variable would you expect to not have any association with the professor’s score.
-A.
+A. I would expect "cls_did_eval" to be the worst predictor because it is an absolute number, which is probably not very meaningful given variations in class size. 
 
 Q12. Check your suspicions from the previous exercise. Include the model output for that variable in your response.
-A. 
+A. As expected, cls_did_eval is a very weak predictor, explaining only a small fraction of a percent of the variation in eval scores. 
+Our linear model will be y(score) = 4.14 + 0.0008 x cls_did_eval. 
+
+```{r Part2.12}
+m_dideval.lm <- lm(score ~ cls_did_eval, data = evals)
+summary(m_dideval.lm)
+```
+
 
 Q13. Suppose you wanted to fit a full model with the variables listed above. If you are already going to include cls_perc_eval and cls_students, which variable should you not include as an additional predictor? Why?
-A. 
+A. We should not include cls_did_eval. The "cls_did_eval" variable would be redundant, once we take into account ls_perc_eval and cls_students. 
 
 Q14. Fit a full model with all predictors listed above (except for the one you decided to exclude) in the previous question.
-A. 
+A. This gives us Multiple R-squared:  0.1635,	Adjusted R-squared:  0.1412.
+
+```{r Part2.14}
+m_allpreds.lm <- lm(score ~ bty_avg + rank + ethnicity + gender + language + age + cls_perc_eval + cls_students + cls_level + cls_profs + cls_credits, data = evals)
+summary(m_allpreds.lm)
+```
+
 
 Q15. Using backward-selection with adjusted R-squared as the selection criterion, determine the best model. You do not need to show all steps in your answer, just the output for the final model. Also, write out the linear model for predicting score based on the final model you settle on.
-A. 
+A. Adjusted R-squared:  0.14
+Our linear model will be y(score) = 3.53 + 0.06 x bty_avg + 0.19 x ethnicity + 0.18 x gender -0.01 x age + 0.006 x cls_perc_eval + .51 x cls_credits. 
+
+```{r Part2.15}
+m_bestmod.lm <- lm(score ~ bty_avg + ethnicity + gender + age + cls_perc_eval + cls_credits, data = evals)
+summary(m_bestmod.lm)
+```
 
 Q16. Interpret the slopes of one numerical and one categorical predictor based on your final model.
-A.
+A. Numerical- cls_perc_eval. All else held constant, a one unit increase in percent who completed evaluation is associated with an increase of .01 points on eval score.
+Categorical- gender.  All else held constant, being male is associated with an increase of .18 points on eval score.
 
 Q17. Based on your final model, describe the characteristics of a professor and course at University of Texas at Austin that would be associated with a high evaluation score.
-A. 
+A. This would be a younger, non-minority male, teaching a one-credit course where a relatively large percent of students completed their evaluations. 
 
 Q18. Would you be comfortable generalizing your conclusions to apply to professors generally (at any university)? Why or why not?
-A. 
+A. The fact that the one-credit course carries so much weight in the evals leads me to hesitate in applying my conclusions broadly. For instance, younger, non-minority males teaching a multi-credit course might have completely different eval scores. 
+In other words, the high evaluation score at the University of Texas seems to be overly-dependent on teaching a single-credit course. The characteristics of those courses, and the students who take them, would need to be clarified substantially. 
 
 ...
-
-
