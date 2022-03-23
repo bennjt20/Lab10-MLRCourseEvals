@@ -1,7 +1,7 @@
 ---
 title: "Lab 10 - Grading the professor, Pt. 2"
-author: "Insert your name here"
-date: "Insert date here"
+author: "John T. Bennett"
+date: "March 23, 2022"
 output: github_document
 ---
 
@@ -9,19 +9,110 @@ output: github_document
 
 ```{r load-packages, message=FALSE}
 library(tidyverse) 
-library(tidymodels)
+library(broom)
 library(openintro)
 ```
 
-### Exercise 1
+```{r ?evals}
+?evals
+```
 
-Remove this text, and add your answer for Exercise 1 here.
-Add code chunks as needed.
-Don't forget to label your code chunk.
-Do not use spaces in code chunk labels.
+### Part 1: Simple linear regression
+Q. Fit a linear model (one you have fit before): m_bty, predicting average professor evaluation score based on average beauty rating (bty_avg) only. Write the linear model, and note the R2 and the adjusted R2.
+A. Our linear model (y=b0+b1x) will be y = 3.88 + .066 
+R-squared:  0.03502,	Adjusted R-squared:  0.03293
 
-### Exercise 2
+```{r Linearmodel1}
+m_bty.lm <- lm(score ~ bty_avg, data = evals)
+summary(m_bty.lm)
+```
+
+
+```{r Part1}
+p <- ggplot(evals, aes(bty_avg, score))
+p + geom_point()
+```
+
+
+### Part 2: Multiple linear regression
+Q2. Fit a linear model (one you have fit before): m_bty_gen, predicting average professor evaluation score based on average beauty rating (bty_avg) and gender. Write the linear model, and note the R2 and the adjusted R2.
+A. Our linear model will be y(score) = 3.75 + 0.07 x bty_avg  + 0.17 x gendermale
+R-squared:  0.05912,	Adjusted R-squared:  0.05503 
+
+```{r Part2.2}
+m_bty_gen.lm <- lm(score ~ bty_avg + gender, data = evals)
+summary(m_bty_gen.lm)
+```
+
+Q3. Interpret the slope and intercept of m_bty_gen in context of the data.
+A. Slope bty_avg 0.07. All else held constant, for each unit increase in bty_ave, we would expect the eval score to be higher, on average, by 0.07 points.
+Slope gendermale   0.17. All else held constant, males receive higher eval scores, on average, by 0.17 points.
+Intercept 3.74. Females with 0 bty-ave are expected to have an eval score of 3.74, on average. (A zero bty-ave doesn't make sense in context.)
+
+Q4. What percent of the variability in score is explained by the model m_bty_gen.
+A. Roughly 6 percent of the variability in score is explained by this model.
+
+Q5. What is the equation of the line corresponding to just male professors?
+A. The linear model will be y(score) = 3.75 + 0.07 x bty_avg  + 0.17 x gendermale. 
+
+Q6. For two professors who received the same beauty rating, which gender tends to have the higher course evaluation score?
+A. All else held constant, males receive higher eval scores, on average, by 0.17 points. We get this from our Slope gendermale data 0.17. 
+
+Q7. How does the relationship between beauty and evaluation score vary between male and female professors?
+A. This question appears to be asking for an interaction effect. 
+
+``{r Part2.7}
+eval_interaction <- linear_reg() %>%
+set_engine("lm") %>%
+fit(score ~ bty_ave * gender, data = eval)
+tidy(eval_interaction)
+``
+[Note: could not find function fit]
+
+Q8. How do the adjusted R2 values of m_bty_gen and m_bty compare? What does this tell us about how useful gender is in explaining the variability in evaluation scores when we already have information on the beauty score of the professor.
+A. m_bty_gen includes the gender/bty_ave interaction, and this increases adjusted R2 (.055), so the model with the interactions explains more of the variance in eval score than the model with bty_ave alone (.033).
+
+```{r Part2.8}
+glance(m_bty_gen.lm)$adj.r.squared
+glance(m_bty.lm)$adj.r.squared
+```
+
+
+Q9. Compare the slopes of bty_avg under the two models (m_bty and m_bty_gen). Has the addition of gender to the model changed the parameter estimate (slope) for bty_avg?
+A. Yes, the addition of gender to the bty_gen model increased the slope of bty_avg:
+1) m_bty. Slope of bty_avg (0.066).
+2) m_bty_gen. Slope of bty_avg (0.074). 
+
+Q10. Create a new model called m_bty_rank with gender removed and rank added in. Write the equation of the linear model and interpret the slopes and intercept in context of the data.
+A. 
+
+### Part 3: The search for the best model
+Going forward, only consider the following variables as potential predictors: rank, ethnicity, gender, language, age, cls_perc_eval, cls_did_eval, cls_students, cls_level, cls_profs, cls_credits, bty_avg.
+
+Q11. Which variable, on its own, would you expect to be the worst predictor of evaluation scores? Why? Hint: Think about which variable would you expect to not have any association with the professor’s score.
+A.
+
+Q12. Check your suspicions from the previous exercise. Include the model output for that variable in your response.
+A. 
+
+Q13. Suppose you wanted to fit a full model with the variables listed above. If you are already going to include cls_perc_eval and cls_students, which variable should you not include as an additional predictor? Why?
+A. 
+
+Q14. Fit a full model with all predictors listed above (except for the one you decided to exclude) in the previous question.
+A. 
+
+Q15. Using backward-selection with adjusted R-squared as the selection criterion, determine the best model. You do not need to show all steps in your answer, just the output for the final model. Also, write out the linear model for predicting score based on the final model you settle on.
+A. 
+
+Q16. Interpret the slopes of one numerical and one categorical predictor based on your final model.
+A.
+
+Q17. Based on your final model, describe the characteristics of a professor and course at University of Texas at Austin that would be associated with a high evaluation score.
+A. 
+
+Q18. Would you be comfortable generalizing your conclusions to apply to professors generally (at any university)? Why or why not?
+A. 
 
 ...
 
-Add exercise headings as needed.
+
